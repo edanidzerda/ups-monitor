@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \
     python3-setuptools \
     python3-venv \
+    nut-client \
     && apt-get clean
 
 # Copy the dependencies file to the working directory

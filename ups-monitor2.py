@@ -9,7 +9,7 @@ from newrelic_telemetry_sdk import GaugeMetric, CountMetric, SummaryMetric, Metr
 def get_ups_status():
     try:
         # Run the upsc command to get UPS status
-        result = subprocess.run(['upsc', 'myups'], capture_output=True, text=True, check=True)
+        result = subprocess.run(['upsc', 'myups@localhost'], capture_output=True, text=True, check=True)
         if result.returncode != 0:
             print('Error getting UPS status:', result.stderr)
             return None
