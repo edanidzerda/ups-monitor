@@ -1,0 +1,12 @@
+[flake8]
+exclude = 
+    venv,
+    .venv,
+    __pycache__,
+    build,
+    dist,
+    .git,
+    .tox,
+    .eggs,
+    *.egg-info,
+    # Add any other directories or files you want to exclude

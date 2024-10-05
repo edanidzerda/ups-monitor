@@ -24,5 +24,5 @@ RUN pip install -r requirements.txt
 # Copy the content of the local src directory to the working directory 
 COPY . .
 
-# Run ups-monitor2.py when the container launches
-CMD ["python", "ups-monitor2.py"]
+# Run ups-monitor.py when the container launches
+CMD ["python", "ups_monitor.py"]

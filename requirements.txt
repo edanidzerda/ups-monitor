@@ -1,3 +1,4 @@
 psutil
 newrelic
 newrelic-telemetry-sdk
+PyNUTClient
