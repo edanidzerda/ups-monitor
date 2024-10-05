@@ -83,11 +83,12 @@ ups_host = os.environ.get("UPS_HOST", "localhost")
 ups_login = os.environ.get("UPS_LOGIN", "")
 ups_password = os.environ.get("UPS_PASSWORD", "")
 
-while True:
-    status = get_ups_status(ups_name=ups, host=ups_host, login=ups_login, password=ups_password)
-    if status:
-        print(status)
-        send_metrics(status)
-    else: 
-        print('Battery not found')
-    time.sleep(300)
+if __name__ == '__main__':
+    while True:
+        status = get_ups_status(ups_name=ups, host=ups_host, login=ups_login, password=ups_password)
+        if status:
+            print(status)
+            send_metrics(status)
+        else: 
+            print('Battery not found')
+        time.sleep(300)
