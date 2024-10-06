@@ -1,9 +1,20 @@
 import unittest
 import os
 from unittest.mock import patch, MagicMock
-from ups_monitor import send_metrics, create_metric
+from ups_monitor import send_metrics, create_metric, get_metrics
 
 class TestUPSMonitor(unittest.TestCase):
+    # TODO - Figure out how to override the environment for the whole test
+    # Don't want to check the environment in the function
+    # @patch.dict(os.environ, {'UPS_BATTERY_METRICS': 'battery.charge'})
+    # def test_metric_override(self):
+    #     status = {
+    #         'battery.charge': '100',
+    #         'ups.load': '50',
+    #         'banana.charge': '100'
+    #     }
+    #     metrics = get_metrics(status)
+    #     self.assertEqual(len(metrics), 1)
 
     @patch('ups_monitor.PyNUT.PyNUTClient')
     @patch('ups_monitor.MetricClient')
@@ -47,5 +58,6 @@ class TestUPSMonitor(unittest.TestCase):
         self.assertEqual(metric.name, 'battery.charge')
         self.assertEqual(metric.value, 100.0)
 
+    
 if __name__ == '__main__':
     unittest.main()

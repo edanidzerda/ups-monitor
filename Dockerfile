@@ -1,6 +1,7 @@
 FROM python:3.7-slim-buster
 
-
+# Tag image to source code
+LABEL org.opencontainers.image.source=https://github.com/edanidzerda/ups-monitor
 # Set the working directory in the container
 WORKDIR /app
 RUN apt-get update && apt-get install -y \
