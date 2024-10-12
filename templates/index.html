@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPS Metrics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
+    <script type="module">
+        import { Application, Controller } from "https://unpkg.com/@hotwired/stimulus/dist/stimulus.js"
+        window.Stimulus = Application.start()
+    
+        // https://stimulus.hotwired.dev/handbook/building-something-real
+        // Used "no build" example to register the clipboard controller, it works!
+        Stimulus.register("clipboard", class extends Controller {
+            static targets = [ "source" ]
+
+            copy() {
+                navigator.clipboard.writeText(this.sourceTarget.value)
+              }
+          }
+        )
+
+        Stimulus.register("hello", class extends Controller {
+          static targets = [ "name" ]
+    
+          connect() {
+          }
+        })
+      </script>
+     
+</head>
+<body>
+    <h1>UPS Metrics</h1>
+    <div data-controller="clipboard">
+        PIN: <input data-clipboard-target="source" type="text" value="1234" readonly>
+        <button data-action="clipboard#copy">Copy to Clipboard</button>
+    </div>
+    <div id="info"></div>
+    <div data-controller="hello">
+        <input data-hello-target="name" type="text">
+    </div>    
+    <h2>Metrics</h2>
+    <table>
+        {% for key, value in global_status.items() %}
+        <tr><td>{{ key }}</td>: <td>{{ value }}</td></tr>
+        {% endfor %}
+    </table>
+    <select id="dateRange" >
+        <option selected value="60">Last 60 minutes</option>
+        <option value="240">Last 4 hours</option>
+        <option value="1440">Last 24 hours</option>
+        <option value="10080">Last 7 days</option>
+    </select>
+
+      <select id="keyInput">
+        <option value="battery.charge">Battery Charge</option>
+        <option value="battery.runtime">Battery Runtime</option>
+        <option value="input.voltage">Input Voltage</option>
+        <option value="output.voltage">Output Voltage</option>
+        </select>
+        <div>
+            <canvas id="myChart"></canvas>
+          </div>
+    <!-- <h2>Raw metrics</h2>
+    <pre id="metrics">Loading...</pre>
+ 
+    <script>
+        async function fetchMetrics() {
+            try {
+                const response = await fetch('/metrics');
+                const data = await response.json();
+
+                const timestamp = new Date(data.timestamp);
+                const now = new Date();
+                const timeAgo = dateFns.formatDistanceToNow(timestamp, { addSuffix: true });
+                document.getElementById('info').textContent = `Last updated: ${timeAgo}`;
+                document.getElementById('metrics').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('metrics').textContent = 'Error fetching metrics';
+            }
+        }
+
+        fetchMetrics();
+        setInterval(fetchMetrics, 60000); // Refresh every 60 seconds -->
+    <!-- </script> -->
+    <script>
+        let myChart;
+        async function fetchMetrics(key, range) {
+            console.log("Fetching metrics for key: " + key);
+            const response = await fetch('/metrics/history?key=' + key + '&range=' + range);
+            const data = await response.json();
+            console.log(data);
+            return data;
+        };
+        async function initializeChart() {
+            const ctx = document.getElementById('myChart');
+            const data = await fetchMetrics('battery.charge', 60);
+            myChart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                scales: {
+                y: {
+                    
+                    beginAtZero: true
+                }
+                }
+            }
+        });
+    }
+    document.getElementById('keyInput').addEventListener('change', (event) => {
+        key = event.target.value;
+        updateChart();
+    });
+    document.getElementById('dateRange').addEventListener('change', (event) => {
+        const range = event.target.value;
+        console.log("Range: " + range);
+        updateChart();
+    });
+    async function updateChart() {
+        key = document.getElementById('keyInput').value
+        range = document.getElementById('dateRange').value;
+        console.log("Updating chart with key: " + key + " and range: " + range);
+        const data = await fetchMetrics(key, range);
+        console.log("Updating chart with data:");
+        console.log(data);
+        myChart.data.labels = data.labels;
+        myChart.data.datasets[0].data = data.datasets[0].data;
+        myChart.data.datasets[0].label = data.datasets[0].label;
+        myChart.update();
+    }
+    initializeChart();
+      </script>
+</body>
+</html>

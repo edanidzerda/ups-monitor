@@ -2,3 +2,5 @@ psutil
 newrelic
 newrelic-telemetry-sdk
 PyNUTClient
+flask
+Jinja2
