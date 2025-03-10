@@ -4,19 +4,28 @@ This project monitors a UPS connected using `nut`.  I created it during the Hurr
 
 It has been tested on a Raspberry Pi 2 running Debian Bullseye.  If you have a UPS configured with NUT, it will be auto-detected.  If you are running this script on the same host as NUT, 'localhost' should succeed and connect.
 
-The data is sent to New Relic.  They have a free plan for hobbyist / home use).  It could be extended to send data to other systems.  (I may extend it to alert directly to Pager Duty.)
+The data can be sent to New Relic.  They have a free plan for hobbyist / home use).  It could be extended to send data to other systems.  (I may extend it to alert directly to Pager Duty.)
 
-If you don't have New Relic, it will just print out the metrics.
+If you don't have New Relic, it will print out metric, and you can view them on a simple web page.
+
+![](./docs/webpage-home.png)
+
+All of the data about your UPS is shown on a seperate page.
+
+![](./docs/full_info.png)
+
+If you have New Relic, you can build dashboard and alerting.
 
 ![](./docs/newrelic-screenshot.png)
 
 # Assumptions
 
 * APC UPS (other UPS brands may be supported)
-* `NUT` installed and running, locally or on a remote host
+* [NUT](https://networkupstools.org) installed and running, locally or on a remote host
 
 # Running
-By default, these metrics are tracked.
+By default, these metrics are tracked.  On the web page, you can select from these to view in the main chart.
+
 ```python
 battery_metrics = ['battery.charge', 
                    'ups.load', 
@@ -58,5 +67,5 @@ docker run -d -t \
 
 
 * Extend to other systems like InfluxDB
-* Mini web site?
+* Possibly improve web page / local storage
 

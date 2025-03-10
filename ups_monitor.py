@@ -11,7 +11,7 @@ from datetime import datetime
 import json
 import sqlite3
 
-database_name = 'example.db'
+DATABASE_FILE = 'ups-metrics.db'
 
 # Don't forget to set the NEW_RELIC_LICENSE_KEY environment variable
 # before running this script
@@ -108,7 +108,7 @@ def send_metrics(status):
 
 def background_ups_monitor():
     """This function will run in a background thread to monitor the UPS status"""
-    conn = sqlite3.connect('example.db')
+    conn = sqlite3.connect(DATABASE_FILE)
     c = conn.cursor()
     while True:
         print("Checking UPS stats on thread: ",threading.current_thread())
@@ -121,7 +121,7 @@ def background_ups_monitor():
 
 
 def write_to_db(stats):
-    conn = sqlite3.connect('example.db')
+    conn = sqlite3.connect(DATABASE_FILE)
     c = conn.cursor()
     c.execute(''' INSERT INTO metrics (data) VALUES (?)''',(json.dumps(stats),))
     print("Writing to DB: ", desired_metrics)
@@ -140,35 +140,27 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template('index.html', global_status=desired_metrics)
+    summary = {}
+    summary['Model'] = global_status.get('device.model', 'Unknown')
+    summary['Manufacturer'] = global_status.get('device.mfr', 'Unknown')
+    summary['Manufacture Date'] = global_status.get('ups.mfr.date', 'Unknown')
+    return render_template('index.html', summary=summary, global_status=global_status)
+
+@app.route('/full_info')
+def full_info():
+    return render_template('full_info.html', global_status=global_status)
 
 @app.route('/metrics')
 def metrics_route():
     """return the current UPS status as JSON"""
     return jsonify(global_status)
 
-# @app.route('/metrics/history')
-# def metrics_history():
-#     key = request.args.get('key', 'battery.charge')  # Default to 'battery.charge' if no key is provided
-#     conn = sqlite3.connect(database=database_name)
-#     c = conn.cursor()
-    
-#     # Use parameterized query to prevent SQL injection
-#     query = f'SELECT timestamp, json_extract(data, ?) AS value FROM metrics ORDER BY timestamp DESC'
-#     c.execute(query, (f'$."{key}"',))
-#     rows = c.fetchall()
-#     conn.close()
-    
-#     history = [{'timestamp': row[0], 'value': row[1]} for row in rows]
-    
-#     return jsonify(history)
-
 @app.route('/metrics/history')
 def metrics_history():
     key = request.args.get('key', 'battery.charge')  # Default to 'battery.charge' if no key is provided
     dateRange = request.args.get('range', '60')
     print("Date Range: ", dateRange)
-    conn = sqlite3.connect(database_name)
+    conn = sqlite3.connect(DATABASE_FILE)
     c = conn.cursor()
     
     # Use parameterized query to prevent SQL injection
@@ -204,7 +196,7 @@ def metrics_history():
 
 @app.route('/metrics/keys')
 def metrics_keys():
-    conn = sqlite3.connect(database=database_name)
+    conn = sqlite3.connect(DATABASE_FILE)
     c = conn.cursor()
     
     # Select all keys from the JSON data
@@ -224,7 +216,7 @@ if __name__ == '__main__':
 
     # Connect to the SQLite database
 
-    conn = sqlite3.connect(database_name)
+    conn = sqlite3.connect(DATABASE_FILE)
     c = conn.cursor()
 
     # Create a table with a JSON column
