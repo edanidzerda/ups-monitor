@@ -27,3 +27,6 @@ COPY . .
 
 # Run ups-monitor.py when the container launches
 CMD ["python", "ups_monitor.py"]
+
+# Expose port 5001 to enable web access
+EXPOSE 5001 
